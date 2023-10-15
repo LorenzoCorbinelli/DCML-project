@@ -5,7 +5,7 @@ from multiprocessing import Pool, cpu_count
 
 
 def current_ms():
-    return round(time.time() * 1000)
+    return round(time.time_ns() / 1e+6)
 
 
 def CPUStress(csv_filename):
@@ -19,7 +19,7 @@ def CPUStress(csv_filename):
     start_time = current_ms()
     pool = Pool(cpu_count())
     pool.map_async(stress_cpu, range(cpu_count()))
-    time.sleep((1000 - (current_ms() - start_time)) / 1000.0)
+    time.sleep((3000 - (current_ms() - start_time)) / 1000.0)
     if pool is not None:
         pool.terminate()
     csvData = {"startTime": start_time, "endTime": current_ms()}

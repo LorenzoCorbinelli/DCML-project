@@ -25,11 +25,11 @@ def monitor(max_obs, csv_filename):
             if n == 0:
                 writer.writeheader()
             writer.writerow(cpu_t_p)
-        print(round(time.time() * 1000), cpu_t_p)
+        print(round(start_time / 1e+6), cpu_t_p)
         exec_time = time.time_ns() - start_time
         time.sleep(1 - exec_time / 1e+9)
         n += 1
 
 
 if __name__ == "__main__":
-    monitor(20, "data.csv")
+    monitor(10, "data.csv")
