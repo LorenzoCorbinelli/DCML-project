@@ -17,19 +17,32 @@ def monitor(max_obs, csv_filename):
     n = 0
     while n < max_obs:
         start_time = time.time_ns()
-        cpu_t_p = psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
-       # mem = psutil.virtual_memory()._asdict()
-       # cpu_t_p.update(mem)
+        data = {}
+
+        # Elements to monitoring
+        cpu = CPUMonitor()
+        mem = virtualMemoryMonitor()
+
+        data.update(cpu)
+        data.update(mem)
         with open(csv_filename, "a", newline="") as csvfile:
-            writer = csv.DictWriter(csvfile, fieldnames=cpu_t_p.keys())
+            writer = csv.DictWriter(csvfile, fieldnames=data.keys())
             if n == 0:
                 writer.writeheader()
-            writer.writerow(cpu_t_p)
-        print(round(start_time / 1e+6), cpu_t_p)
+            writer.writerow(data)
+        print(round(start_time / 1e+6), data)
         exec_time = time.time_ns() - start_time
         time.sleep(1 - exec_time / 1e+9)
         n += 1
 
 
+def CPUMonitor():
+    return psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
+
+
+def virtualMemoryMonitor():
+    return psutil.virtual_memory()._asdict()
+
+
 if __name__ == "__main__":
-    monitor(10, "data.csv")
+    monitor(15, "data.csv")
