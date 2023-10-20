@@ -9,6 +9,13 @@ def current_ms():
     return round(time.time_ns() / 1e+6)
 
 
+def csv_writer(csv_filename, start_time):
+    csvData = {"startTime": start_time, "endTime": current_ms()}
+    with open(csv_filename, "a", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=csvData.keys())
+        writer.writeheader()
+        writer.writerow(csvData)
+
 def CPUStress(csv_filename):
     '''
     Function for stress the CPU
@@ -24,12 +31,9 @@ def CPUStress(csv_filename):
     time.sleep((3000 - (current_ms() - start_time)) / 1000.0)
     if pool is not None:
         pool.terminate()
-    csvData = {"startTime": start_time, "endTime": current_ms()}
+
     print("Injection CPU ended")
-    with open(csv_filename, "a", newline="") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=csvData.keys())
-        writer.writeheader()
-        writer.writerow(csvData)
+    csv_writer(csv_filename, start_time)
 
 
 def stress_cpu(x: int = 1234):
@@ -55,12 +59,8 @@ def memoryStress(csv_filename):
         else:
             time.sleep(0.001)
 
-    csvData = {"startTime": start_time, "endTime": current_ms()}
     print("Injection memory ended")
-    with open(csv_filename, "a", newline="") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=csvData.keys())
-        writer.writeheader()
-        writer.writerow(csvData)
+    csv_writer(csv_filename, start_time)
 
 
 def diskStress(csv_filename):
@@ -82,12 +82,9 @@ def diskStress(csv_filename):
     if list_pool is not None:
         for pool_disk in list_pool:
             pool_disk.terminate()
-    csvData = {"startTime": start_time, "endTime": current_ms()}
+
     print("Injection disk ended")
-    with open(csv_filename, "a", newline="") as csvfile:
-        writer = csv.DictWriter(csvfile, fieldnames=csvData.keys())
-        writer.writeheader()
-        writer.writerow(csvData)
+    csv_writer(csv_filename, start_time)
 
 
 def stress_disk():
@@ -107,5 +104,7 @@ def stress_disk():
 
 if __name__ == "__main__":
     CPUStress("CPU_injection.csv")
+    time.sleep(2)
     memoryStress("memory_injection.csv")
+    time.sleep(2)
     diskStress("disk_injection.csv")
