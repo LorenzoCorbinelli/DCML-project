@@ -22,9 +22,11 @@ def monitor(max_obs, csv_filename):
         # Elements to monitoring
         cpu = CPUMonitor()
         mem = virtualMemoryMonitor()
+        disk = diskMonitor()
 
         data.update(cpu)
         data.update(mem)
+        data.update(disk)
         with open(csv_filename, "a", newline="") as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=data.keys())
             if n == 0:
@@ -42,6 +44,10 @@ def CPUMonitor():
 
 def virtualMemoryMonitor():
     return psutil.virtual_memory()._asdict()
+
+
+def diskMonitor():
+    return psutil.disk_io_counters()._asdict()
 
 
 if __name__ == "__main__":
