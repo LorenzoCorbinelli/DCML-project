@@ -16,6 +16,7 @@ def csv_writer(csv_filename, start_time):
         writer.writeheader()
         writer.writerow(csvData)
 
+
 def CPUStress(csv_filename):
     '''
     Function for stress the CPU
