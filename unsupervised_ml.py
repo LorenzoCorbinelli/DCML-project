@@ -12,9 +12,9 @@ if __name__ == "__main__":
     label = data_frame["label_bin"]
     features = data_frame.drop(columns=["_timestamp", "label", "label_bin"])
 
-    feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5)
+    feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 
-    classifiers = [HBOS(), ABOD(), COPOD()]
+    classifiers = [HBOS(contamination=0.17), ABOD(contamination=0.17), COPOD(contamination=0.17)]
 
     for cl in classifiers:
         start_train = current_ms()
