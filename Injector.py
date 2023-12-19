@@ -3,6 +3,7 @@ import os
 import tempfile
 import time
 from multiprocessing import Pool, cpu_count
+from threading import Thread
 
 
 def current_ms():
@@ -17,24 +18,30 @@ def csv_writer(csv_filename, start_time):
         writer.writerow(csvData)
 
 
-def CPUStress(csv_filename):
-    '''
-    Function for stress the CPU
-    :param csv_filename: name of the csv file
+class CPUStress (Thread):
+    """
+    Class for stress the CPU
+    :param duration: duration of the injection
     :return:
-    '''
-    if os.path.exists(csv_filename):
-        os.remove(csv_filename)
-    print("Starting injection CPU")
-    start_time = current_ms()
-    pool = Pool(cpu_count())
-    pool.map_async(stress_cpu, range(cpu_count()))
-    time.sleep((3000 - (current_ms() - start_time)) / 1000.0)
-    if pool is not None:
-        pool.terminate()
+    """
+    def __init__(self, duration):
+        Thread.__init__(self)
+        self.csv_filename = "CPU_injection.csv"
+        self.duration = duration
 
-    print("Injection CPU ended")
-    csv_writer(csv_filename, start_time)
+    def run(self):
+        if os.path.exists(self.csv_filename):
+            os.remove(self.csv_filename)
+        print("Starting injection CPU")
+        start_time = current_ms()
+        pool = Pool(cpu_count())
+        pool.map_async(stress_cpu, range(cpu_count()))
+        time.sleep((self.duration - (current_ms() - start_time)) / 1000.0)
+        if pool is not None:
+            pool.terminate()
+
+        print("Injection CPU ended")
+        csv_writer(self.csv_filename, start_time)
 
 
 def stress_cpu(x: int = 1234):
@@ -42,55 +49,67 @@ def stress_cpu(x: int = 1234):
         x * x
 
 
-def memoryStress(csv_filename):
-    '''
-    Function for stress the memory
-    :param csv_filename: name of the csv file
+class MemoryStress(Thread):
+    """
+    Class for stress the memory
+    :param duration: duration of the injection
     :return:
-    '''
-    if os.path.exists(csv_filename):
-        os.remove(csv_filename)
-    print("Starting injection memory")
-    start_time = current_ms()
-    list = []
-    while True:
-        list.append([999 for i in range(0, 12345678)])
-        if current_ms() - start_time > 3000:
-            break
-        else:
-            time.sleep(0.001)
+    """
+    def __init__(self, duration):
+        Thread.__init__(self)
+        self.csv_filename = "memory_injection.csv"
+        self.duration = duration
 
-    print("Injection memory ended")
-    csv_writer(csv_filename, start_time)
+    def run(self):
+        if os.path.exists(self.csv_filename):
+            os.remove(self.csv_filename)
+        print("Starting injection memory")
+        start_time = current_ms()
+        list = []
+        while True:
+            list.append([99999 for i in range(0, 123456789)])
+            if current_ms() - start_time > self.duration:
+                break
+            else:
+                time.sleep(0.001)
+
+        print("Injection memory ended")
+        csv_writer(self.csv_filename, start_time)
 
 
-def diskStress(csv_filename):
-    '''
-    Function for stress the disk
-    :param csv_filename: name of the csv file
+class DiskStress(Thread):
+    """
+    Class for stress the disk
+    :param duration: duration of the injection
     :return:
-    '''
-    workers = 10
-    if os.path.exists(csv_filename):
-        os.remove(csv_filename)
-    print("Starting injection disk")
-    start_time = current_ms()
-    list_pool = []
-    pool = Pool(workers)
-    pool.map_async(stress_disk, range(workers))
-    list_pool.append(pool)
-    time.sleep((3000 - (current_ms() - start_time)) / 1000.0)
-    if list_pool is not None:
-        for pool_disk in list_pool:
-            pool_disk.terminate()
+    """
+    def __init__(self, duration):
+        Thread.__init__(self)
+        self.csv_filename = "disk_injection.csv"
+        self.duration = duration
 
-    print("Injection disk ended")
-    csv_writer(csv_filename, start_time)
+    def run(self):
+        workers = 10
+        if os.path.exists(self.csv_filename):
+            os.remove(self.csv_filename)
+        print("Starting injection disk")
+        start_time = current_ms()
+        list_pool = []
+        pool = Pool(workers)
+        pool.map_async(stress_disk, range(workers))
+        list_pool.append(pool)
+        time.sleep((self.duration - (current_ms() - start_time)) / 1000.0)
+        if list_pool is not None:
+            for pool_disk in list_pool:
+                pool_disk.terminate()
+
+        print("Injection disk ended")
+        csv_writer(self.csv_filename, start_time)
 
 
 def stress_disk():
     block_to_write = 'x' * 1048576
-    n_blocks = 50
+    n_blocks = 300
     while True:
         filehandle = tempfile.TemporaryFile(dir='./')
         for _ in range(n_blocks):
@@ -101,11 +120,3 @@ def stress_disk():
         filehandle.close()
         del content
         del filehandle
-
-
-if __name__ == "__main__":
-    CPUStress("CPU_injection.csv")
-    time.sleep(2)
-    memoryStress("memory_injection.csv")
-    time.sleep(2)
-    diskStress("disk_injection.csv")
