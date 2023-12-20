@@ -1,7 +1,7 @@
 import csv
-import os
 import tempfile
 import time
+import os
 from multiprocessing import Pool, cpu_count
 from threading import Thread
 
@@ -12,9 +12,13 @@ def current_ms():
 
 def csv_writer(csv_filename, start_time):
     csvData = {"startTime": start_time, "endTime": current_ms()}
+    header = False
+    if not os.path.exists(csv_filename):
+        header = True
     with open(csv_filename, "a", newline="") as csvfile:
         writer = csv.DictWriter(csvfile, fieldnames=csvData.keys())
-        writer.writeheader()
+        if header:
+            writer.writeheader()
         writer.writerow(csvData)
 
 
@@ -30,8 +34,6 @@ class CPUStress (Thread):
         self.duration = duration
 
     def run(self):
-        if os.path.exists(self.csv_filename):
-            os.remove(self.csv_filename)
         print("Starting injection CPU")
         start_time = current_ms()
         pool = Pool(cpu_count())
@@ -61,8 +63,6 @@ class MemoryStress(Thread):
         self.duration = duration
 
     def run(self):
-        if os.path.exists(self.csv_filename):
-            os.remove(self.csv_filename)
         print("Starting injection memory")
         start_time = current_ms()
         list = []
@@ -90,8 +90,6 @@ class DiskStress(Thread):
 
     def run(self):
         workers = 10
-        if os.path.exists(self.csv_filename):
-            os.remove(self.csv_filename)
         print("Starting injection disk")
         start_time = current_ms()
         list_pool = []
