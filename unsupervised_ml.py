@@ -7,14 +7,14 @@ from sklearn.model_selection import train_test_split
 from Injector import current_ms
 
 if __name__ == "__main__":
-    data_frame = pandas.read_csv("dataset_arancino_monitor.csv", sep=',')
+    data_frame = pandas.read_csv("dataset.csv", sep=',')
 
-    label = data_frame["label_bin"]
-    features = data_frame.drop(columns=["_timestamp", "label", "label_bin"])
+    label = data_frame["label"]
+    features = data_frame.drop(columns=["timestamp", "label"])
 
     feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 
-    classifiers = [HBOS(contamination=0.17), ABOD(contamination=0.17), COPOD(contamination=0.17)]
+    classifiers = [HBOS(contamination=0.13), ABOD(contamination=0.13), COPOD(contamination=0.13)]
 
     for cl in classifiers:
         start_train = current_ms()

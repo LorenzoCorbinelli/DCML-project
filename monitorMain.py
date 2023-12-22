@@ -6,6 +6,7 @@ import pandas
 import random
 from threading import Thread
 import Injector
+import detector
 
 
 class Monitor(Thread):
@@ -44,6 +45,8 @@ class Monitor(Thread):
                     if n == 0:
                         writer.writeheader()
                     writer.writerow(data)
+            else:
+                detector.detect(data)
 
             exec_time = time.time_ns() - start_time
             time.sleep(1 - exec_time / 1e+9)
@@ -79,6 +82,7 @@ def labelColumn():
     data_frame["label"] = label
     data_frame.to_csv("dataset.csv", index=False)
 
+
 def CPUMonitor():
     return psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
 
@@ -92,8 +96,6 @@ def diskMonitor():
 
 
 def removeCsvFiles():
-    if os.path.exists("dataset.csv"):
-        os.remove("dataset.csv")
     if os.path.exists("CPU_injection.csv"):
         os.remove("CPU_injection.csv")
     if os.path.exists("memory_injection.csv"):
@@ -104,16 +106,31 @@ def removeCsvFiles():
 
 if __name__ == "__main__":
     removeCsvFiles()
-
+    train = False
     injections = [Injector.CPUStress, Injector.MemoryStress, Injector.DiskStress]
-    threadMonitor = Monitor(100, "dataset.csv", True)
-    threadMonitor.start()
-    time.sleep(15)
-    for i in range(2):
-        random.shuffle(injections)
-        for inj in injections:
-            thread = inj(3000)
-            thread.start()
-            thread.join()
+    if train:   # training
+        if os.path.exists("dataset.csv"):
+            os.remove("dataset.csv")
+        threadMonitor = Monitor(500, "dataset.csv", train)
+        threadMonitor.start()
+        time.sleep(15)
+        for i in range(8):
+            random.shuffle(injections)
+            for inj in injections:
+                thread = inj(3000)
+                thread.start()
+                thread.join()
+                time.sleep(5)
             time.sleep(8)
-        time.sleep(2)
+    else:   # detect
+        detector.loadModel()
+        threadMonitor = Monitor(50, "", train)
+        threadMonitor.start()
+        time.sleep(5)
+        for i in range(2):
+            random.shuffle(injections)
+            for inj in injections:
+                thread = inj(3000)
+                thread.start()
+                thread.join()
+                time.sleep(2)
