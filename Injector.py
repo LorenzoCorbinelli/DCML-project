@@ -5,6 +5,11 @@ import os
 from multiprocessing import Pool, cpu_count
 from threading import Thread
 
+"""
+This file is used for inject some anomalies during monitoring.
+It's used in the monitorMain.py file
+"""
+
 
 def current_ms():
     return round(time.time_ns() / 1e+6)
@@ -67,7 +72,7 @@ class MemoryStress(Thread):
         start_time = current_ms()
         list = []
         while True:
-            list.append([99999 for i in range(0, 123456789)])
+            list.append([555555 for i in range(0, 123456789)])
             if current_ms() - start_time > self.duration:
                 break
             else:
@@ -106,15 +111,15 @@ class DiskStress(Thread):
 
 
 def stress_disk():
-    block_to_write = 'x' * 1048576
-    n_blocks = 300
+    block_to_write = 'x' * 1234567
+    n_blocks = 500
     while True:
         filehandle = tempfile.TemporaryFile(dir='./')
         for _ in range(n_blocks):
             filehandle.write(block_to_write)
         filehandle.seek(0)
         for _ in range(n_blocks):
-            content = filehandle.read(1048576)
+            content = filehandle.read(1234567)
         filehandle.close()
         del content
         del filehandle

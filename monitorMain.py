@@ -7,6 +7,10 @@ import random
 from threading import Thread
 import Injector
 import detector
+"""
+This is the main file and the only one to execute even if you want build the training set (set the variable train=True)
+or if you want just do monitoring (set the variable train=False)
+"""
 
 
 class Monitor(Thread):
@@ -45,7 +49,7 @@ class Monitor(Thread):
                     if n == 0:
                         writer.writeheader()
                     writer.writerow(data)
-            else:
+            else:   # for monitoring: call to the ML algorithm for prediction
                 detector.detect(data)
 
             exec_time = time.time_ns() - start_time
@@ -84,7 +88,11 @@ def labelColumn():
 
 
 def CPUMonitor():
-    return psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
+    data = psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
+    del data["idle"]
+    del data["interrupt"]
+    del data["dpc"]
+    return data
 
 
 def virtualMemoryMonitor():
@@ -92,7 +100,14 @@ def virtualMemoryMonitor():
 
 
 def diskMonitor():
-    return psutil.disk_io_counters()._asdict()
+    data = psutil.disk_io_counters()._asdict()
+    del data["read_count"]
+    del data["write_count"]
+    del data["read_bytes"]
+    del data["write_bytes"]
+    del data["read_time"]
+    del data["write_time"]
+    return data
 
 
 def removeCsvFiles():
@@ -120,7 +135,7 @@ if __name__ == "__main__":
                 thread = inj(3000)
                 thread.start()
                 thread.join()
-                time.sleep(5)
+                time.sleep(10)
             time.sleep(8)
     else:   # detect
         detector.loadModel()

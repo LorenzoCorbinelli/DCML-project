@@ -5,6 +5,11 @@ from pyod.models.copod import COPOD
 from pyod.models.hbos import HBOS
 from sklearn.model_selection import train_test_split
 from Injector import current_ms
+"""
+This file is used for compare different unsupervised machine learning algorithms
+based on the generated training set.
+Due to a lower accuracy in respect to supervised ML algorithms there's no a model saving procedure (see supervised_ml.py).
+"""
 
 if __name__ == "__main__":
     data_frame = pandas.read_csv("dataset.csv", sep=',')
@@ -14,7 +19,7 @@ if __name__ == "__main__":
 
     feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 
-    classifiers = [HBOS(contamination=0.13), ABOD(contamination=0.13), COPOD(contamination=0.13)]
+    classifiers = [HBOS(contamination=0.096), ABOD(contamination=0.096), COPOD(contamination=0.096)]
 
     for cl in classifiers:
         start_train = current_ms()

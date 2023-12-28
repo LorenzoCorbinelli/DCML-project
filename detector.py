@@ -2,7 +2,13 @@ import pickle
 import pandas
 import os
 
+"""
+This file is used to make prediction on the data produced by the monitor.
+It's used in monitorMain.py file.
+"""
+
 writeHeader = True
+
 
 def loadModel():
     global model

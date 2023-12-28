@@ -8,6 +8,11 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.neighbors import KNeighborsClassifier
 from Injector import current_ms
 import pickle
+"""
+This file is used for compare different supervised machine learning algorithms
+based on the generated training set.
+At the end of the file the best algorithm is saved on a file.
+"""
 
 if __name__ == "__main__":
     data_frame = pandas.read_csv("dataset.csv", sep=',')
@@ -41,15 +46,9 @@ if __name__ == "__main__":
         print("Accuracy is %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
 
     # selected algorithm:
-    start_train = current_ms()
-    cl = RandomForestClassifier(n_estimators=3).fit(feat_train, lab_train)
-    end_train = current_ms()
-
-    predicted_labels = cl.predict(feat_test)
-    end_time = current_ms()
-
-    accuracy = sklearn.metrics.accuracy_score(lab_test, predicted_labels)
-    print("Accuracy is %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
+    cl = VotingClassifier(estimators=[('lda', LinearDiscriminantAnalysis()),
+                                      ('nb', GaussianNB()),
+                                      ('dt', tree.DecisionTreeClassifier())]).fit(features, label)
     # save the model
     with open("model.pkl", "wb") as file:
         pickle.dump(cl, file)
