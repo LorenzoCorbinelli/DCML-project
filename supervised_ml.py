@@ -18,7 +18,7 @@ if __name__ == "__main__":
     data_frame = pandas.read_csv("dataset.csv", sep=',')
 
     label = data_frame["label"]
-    features = data_frame.drop(columns=["timestamp", "label"])
+    features = data_frame.drop(columns=["timestamp", "label", "label_bin"])
 
     feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 

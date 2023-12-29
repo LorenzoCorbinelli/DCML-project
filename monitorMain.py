@@ -69,21 +69,25 @@ def labelColumn():
     disk_injection = pandas.read_csv("disk_injection.csv", sep=',')
 
     label = []
+    label_bin = []
     anomaly = False
     for timestamp in data_frame["timestamp"]:
         for i in CPU_injection.index:
             if (CPU_injection["startTime"][i] <= timestamp <= CPU_injection["endTime"][i] or
                     memory_injection["startTime"][i] <= timestamp <= memory_injection["endTime"][i] or
                     disk_injection["startTime"][i] <= timestamp <= disk_injection["endTime"][i]):
-                label.append(1)  # during the injection -> anomaly
+                label.append("anomaly")  # during the injection -> anomaly
+                label_bin.append(1)
                 anomaly = True
                 break
         if not anomaly:
-            label.append(0)     # normal
+            label.append("normal")     # normal
+            label_bin.append(0)
         else:
             anomaly = False
 
     data_frame["label"] = label
+    data_frame["label_bin"] = label_bin
     data_frame.to_csv("dataset.csv", index=False)
 
 
