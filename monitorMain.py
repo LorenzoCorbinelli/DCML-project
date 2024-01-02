@@ -1,4 +1,5 @@
 import os.path
+import sys
 import time
 import psutil
 import csv
@@ -8,8 +9,9 @@ from threading import Thread
 import Injector
 import detector
 """
-This is the main file and the only one to execute even if you want build the training set (set the variable train=True)
-or if you want just do monitoring (set the variable train=False)
+This is the main file and the only one to execute even if you want to build the training set 
+(execute this file with -t or -train argument)
+or if you just want to do monitoring (execute this file without any argument)
 """
 
 
@@ -125,12 +127,13 @@ def removeCsvFiles():
 
 if __name__ == "__main__":
     removeCsvFiles()
-    train = False
     injections = [Injector.CPUStress, Injector.MemoryStress, Injector.DiskStress]
-    if train:   # training
+    if len(sys.argv) > 1:   # training
+        if sys.argv[1] not in ["-t", "-train"]:
+            sys.exit("Acceptable arguments: -t or -train")
         if os.path.exists("dataset.csv"):
             os.remove("dataset.csv")
-        threadMonitor = Monitor(500, "dataset.csv", train)
+        threadMonitor = Monitor(500, "dataset.csv", True)
         threadMonitor.start()
         time.sleep(15)
         for i in range(8):
@@ -143,7 +146,7 @@ if __name__ == "__main__":
             time.sleep(8)
     else:   # detect
         detector.loadModel()
-        threadMonitor = Monitor(50, "", train)
+        threadMonitor = Monitor(50, "", False)
         threadMonitor.start()
         time.sleep(5)
         for i in range(2):

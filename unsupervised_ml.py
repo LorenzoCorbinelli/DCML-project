@@ -30,4 +30,4 @@ if __name__ == "__main__":
         end_time = current_ms()
 
         accuracy = sklearn.metrics.accuracy_score(lab_test, predicted_labels)
-        print("Accuracy is %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
+        print("Accuracy: %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
