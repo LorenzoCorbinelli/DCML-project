@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 
-    classifiers = [HBOS(contamination=0.192), ABOD(contamination=0.192), COPOD(contamination=0.192)]
+    classifiers = [HBOS(contamination=0.19), ABOD(contamination=0.19), COPOD(contamination=0.19)]
 
     for cl in classifiers:
         start_train = current_ms()

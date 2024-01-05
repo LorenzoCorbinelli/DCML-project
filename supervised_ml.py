@@ -46,9 +46,7 @@ if __name__ == "__main__":
         print("Accuracy: %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
 
     # selected algorithm:
-    cl = VotingClassifier(estimators=[('lda', LinearDiscriminantAnalysis()),
-                                      ('nb', GaussianNB()),
-                                      ('dt', tree.DecisionTreeClassifier())]).fit(features, label)
+    cl = KNeighborsClassifier(n_neighbors=20).fit(features, label)
     # save the model
     with open("model.pkl", "wb") as file:
         pickle.dump(cl, file)

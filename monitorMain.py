@@ -95,25 +95,26 @@ def labelColumn():
 
 def CPUMonitor():
     data = psutil.cpu_times_percent(interval=0.1, percpu=False)._asdict()
-    del data["idle"]
-    del data["interrupt"]
-    del data["dpc"]
-    return data
+    indicators = ["user", "system"]     # indicators that I'm interested in monitoring
+    return filterIndicators(data, indicators)
 
 
 def virtualMemoryMonitor():
-    return psutil.virtual_memory()._asdict()
+    data = psutil.virtual_memory()._asdict()
+    indicators = ["total", "available", "percent", "used", "free"]  # indicators that I'm interested in monitoring
+    return filterIndicators(data, indicators)
 
 
 def diskMonitor():
     data = psutil.disk_io_counters()._asdict()
-    del data["read_count"]
-    del data["write_count"]
-    del data["read_bytes"]
-    del data["write_bytes"]
-    del data["read_time"]
-    del data["write_time"]
-    return data
+    # indicators that I'm interested in monitoring
+    indicators = ["read_count", "write_count", "read_bytes", "write_bytes", "read_time", "write_time"]
+    return filterIndicators(data, indicators)
+
+
+def filterIndicators(data, indicators):
+    # Return only the indicators that I want to monitor
+    return {key: data[key] for key in indicators}
 
 
 def removeCsvFiles():
