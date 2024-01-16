@@ -19,7 +19,7 @@ class Monitor(Thread):
     """
     Class for monitoring
     :param max_obs: maximum number of observations
-    :param csv_filename: name of the output file csv
+    :param csv_filename: name of the output file csv (only when train=True)
     :param train: True only for build the training set
     :return: nothing
     """
@@ -60,12 +60,12 @@ class Monitor(Thread):
 
         # add on csv the label column
         if self.train:      # only for build the training set
-            labelColumn()
+            labelColumn(self.csv_filename)
         print("Monitoring ended")
 
 
-def labelColumn():
-    data_frame = pandas.read_csv("dataset.csv", sep=',')
+def labelColumn(csv_filename):
+    data_frame = pandas.read_csv(csv_filename, sep=',')
     CPU_injection = pandas.read_csv("CPU_injection.csv", sep=',')
     memory_injection = pandas.read_csv("memory_injection.csv", sep=',')
     disk_injection = pandas.read_csv("disk_injection.csv", sep=',')
@@ -90,7 +90,7 @@ def labelColumn():
 
     data_frame["label"] = label
     data_frame["label_bin"] = label_bin
-    data_frame.to_csv("dataset.csv", index=False)
+    data_frame.to_csv(csv_filename, index=False)
 
 
 def CPUMonitor():
@@ -134,17 +134,17 @@ if __name__ == "__main__":
             sys.exit("Acceptable arguments: -t or -train")
         if os.path.exists("dataset.csv"):
             os.remove("dataset.csv")
-        threadMonitor = Monitor(500, "dataset.csv", True)
+        threadMonitor = Monitor(1000, "dataset.csv", True)
         threadMonitor.start()
-        time.sleep(15)
-        for i in range(8):
+        time.sleep(30)
+        for i in range(10):
             random.shuffle(injections)
             for inj in injections:
                 thread = inj(3000)
                 thread.start()
                 thread.join()
-                time.sleep(10)
-            time.sleep(8)
+                time.sleep(20)
+            time.sleep(15)
     else:   # detect
         detector.loadModel()
         threadMonitor = Monitor(50, "", False)
@@ -157,3 +157,6 @@ if __name__ == "__main__":
                 thread.start()
                 thread.join()
                 time.sleep(2)
+        # add the right label for check if the ml algorithm works fine
+        threadMonitor.join()
+        labelColumn("detector.csv")

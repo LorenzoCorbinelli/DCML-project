@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
     feat_train, feat_test, lab_train, lab_test = train_test_split(features, label, test_size=0.5, shuffle=False)
 
-    classifiers = [HBOS(contamination=0.19), ABOD(contamination=0.19), COPOD(contamination=0.19)]
+    classifiers = [HBOS(contamination=0.103), ABOD(contamination=0.103), COPOD(contamination=0.103)]
 
     for cl in classifiers:
         start_train = current_ms()
@@ -30,4 +30,5 @@ if __name__ == "__main__":
         end_time = current_ms()
 
         accuracy = sklearn.metrics.accuracy_score(lab_test, predicted_labels)
-        print("Accuracy: %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
+        mcc = sklearn.metrics.matthews_corrcoef(lab_test, predicted_labels)
+        print("Accuracy: %.4f, train time: %d, test time: %d, MCC: %f" % (accuracy, end_train - start_train, end_time - end_train, mcc))

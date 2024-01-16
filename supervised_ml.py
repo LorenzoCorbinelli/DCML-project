@@ -16,7 +16,6 @@ At the end of the file the best algorithm is saved on a file.
 
 if __name__ == "__main__":
     data_frame = pandas.read_csv("dataset.csv", sep=',')
-
     label = data_frame["label"]
     features = data_frame.drop(columns=["timestamp", "label", "label_bin"])
 
@@ -43,10 +42,11 @@ if __name__ == "__main__":
         end_time = current_ms()
 
         accuracy = sklearn.metrics.accuracy_score(lab_test, predicted_labels)
-        print("Accuracy: %.4f, train time: %d, test time: %d" % (accuracy, end_train - start_train, end_time - end_train))
+        mcc = sklearn.metrics.matthews_corrcoef(lab_test, predicted_labels)
+        print("Accuracy: %.4f, train time: %d, test time: %d, MCC: %f" % (accuracy, end_train - start_train, end_time - end_train, mcc))
 
     # selected algorithm:
-    cl = KNeighborsClassifier(n_neighbors=20).fit(features, label)
+    cl = RandomForestClassifier(n_estimators=20).fit(features, label)
     # save the model
     with open("model.pkl", "wb") as file:
         pickle.dump(cl, file)
